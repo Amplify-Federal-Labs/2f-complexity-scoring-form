@@ -1131,9 +1131,27 @@ function downloadCSV() {
             rows.push(r('Total Score', total), r('Tier', tier), r('Estimated Price', price));
         }
     } else {
-        rows.push(r('Customer', s.customer), r('Application', s.appName), r('Engineer', s.engineer), r('Review Date', s.reviewDate));
-        rows.push(r('Sold Tier', s.soldTier), r('Sold Container Count', s.soldContCount), r('SOW Scope Status', s.sowScopeStatus));
-        rows.push(r('Container Score', cs), r('Multi-Env Score', me), r('Auth Score', auth), r('Istio Score', ist), r('Data Score', dat), r('Deploy Score', dep));
+        const add = (label, value) => rows.push(r(label, value));
+        const addGroup = (label, values) => Object.entries(values).forEach(([key, value]) => add(label + ' - ' + key, value));
+
+        add('Customer', s.customer); add('Application', s.appName); add('Engineer', s.engineer);
+        add('Review Date', s.reviewDate); add('Call Date/Time', s.callDateTime);
+        add('SOW Reviewed', s.sowReviewed); add('Sold Tier', s.soldTier);
+        add('Sold Container Count', s.soldContCount); add('Sales Scope Summary', s.salesSummary);
+        add('SOW Assumptions/Exclusions', s.sowAssumptions); add('SOW Scope Status', s.sowScopeStatus);
+        add('Scope Delta', s.scopeDelta); add('SOW Reference', s.sowRef);
+        add('Customer Technical Lead', s.custTechLead); add('Customer App/Product Owner', s.custAppOwner);
+        add('Security/Authorization POC', s.secAuthPOC); add('Second Front Mission Success POC', s.sf2FPOC);
+        add('Second Front Sales/Account POC', s.sfSalesPOC); add('Customer Infrastructure/Platform POC', s.custInfraPOC);
+        add('Target Environment', s.targetEnv); add('Repository', s.repoLocation);
+        add('Application Changed Since Sales Scoping', s.appChanged); add('Changes Identified', s.changesIdentified);
+        add('Customer Expected Outcome', s.custOutcome);
+        add('Container Score', cs); add('Container Evidence', s.evContainers);
+        add('Multi-Environment Score', me); add('Multi-Environment Evidence', s.evMultienv);
+        add('Auth Score', auth); add('Auth Evidence', s.evAuth);
+        add('Istio Score', ist); add('Istio Evidence', s.evIstio);
+        add('Data Strategy Score', dat); add('Data Strategy Evidence', s.evData);
+        add('Deployment Pattern Score', dep); add('Deployment Evidence', s.evDeploy);
         if (cs !== null && me !== null && auth !== null && ist !== null && dat !== null && dep !== null) {
             const sold = parseInt(s.soldTier) || null;
             const ncAvg = (me + auth + ist + dat + dep) / 5;
@@ -1142,7 +1160,13 @@ function downloadCSV() {
             const commRev = (delta > 0) || s.sowScopeStatus === 'Material Change' || s.sowScopeStatus === 'Conflict';
             rows.push(r('NC Average', ncAvg.toFixed(2)), r('Engineering Tier', engTier), r('Tier Delta', delta), r('Commercial Review', commRev ? 'Yes' : 'No'));
         }
-        rows.push(r('Entrance Criteria Status', s.criteriaStatus), r('Access Status', s.accessStatus), r('Disposition', s.d0Disposition), r('Completed Date', s.d0CompletedDate));
+        add('Tier Rationale', s.tierRationale); addGroup('Scope Creep', s.scopeCreep);
+        addGroup('Entrance Criteria', s.criteria); add('Entrance Criteria Status', s.criteriaStatus);
+        add('Entrance Criteria Exceptions', s.criteriaExceptions); addGroup('Access', s.access);
+        add('Access Status', s.accessStatus); add('Technical Blockers', s.techBlockers);
+        add('Customer Dependencies', s.custDeps); add('Second Front Dependencies', s.sfDeps);
+        add('Third-Party Dependencies', s.thirdPartyDeps); add('Open Actions', s.openActions);
+        add('Disposition', s.d0Disposition); add('Completed Date', s.d0CompletedDate); add('Final Notes', s.finalNotes);
     }
 
     const csv = rows.join('\n');
@@ -1156,7 +1180,7 @@ function downloadCSV() {
 // ── Reset ──────────────────────────────────────────────────────────────────────
 function resetForm() {
     if (!confirm('Clear all data and start over?')) return;
-    document.querySelectorAll('input:not([type="file"]), select, textarea').forEach(el => el.value = '');
+    document.querySelectorAll('input:not([type="file"]):not([type="radio"]), select, textarea').forEach(el => el.value = '');
     document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
     try { sessionStorage.removeItem('2fform'); } catch {}
     recalc();
