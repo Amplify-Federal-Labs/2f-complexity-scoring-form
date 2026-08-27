@@ -406,7 +406,7 @@
                     <div class="result-card">
                         <div class="rc-label">Total Score</div>
                         <div class="rc-value" id="s-totalScore">—</div>
-                        <div class="rc-sub">out of 19</div>
+                        <div class="rc-sub">out of 21</div>
                     </div>
                     <div class="result-card">
                         <div class="rc-label">Implementation Tier</div>
@@ -1006,6 +1006,7 @@ function downloadPDF() {
     const s = getFormState();
     const mode = currentMode;
     const win = window.open('', 'pdf');
+    if (!win) { alert('PDF export was blocked by your browser. Allow popups for this page and try again.'); return; }
     const title = mode === 'simple'
         ? `Complexity Scoring — ${s.projectName || 'Assessment'}`
         : `Day Zero Review — ${s.appName || s.customer || 'Review'}`;
@@ -1183,7 +1184,7 @@ function resetForm() {
     document.querySelectorAll('input:not([type="file"]):not([type="radio"]), select, textarea').forEach(el => el.value = '');
     document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
     try { sessionStorage.removeItem('2fform'); } catch {}
-    recalc();
+    setMode('simple');
     switchTab('simple','info', simpleBtnAt(0));
 }
 
