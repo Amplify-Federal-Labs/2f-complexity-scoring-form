@@ -1070,9 +1070,9 @@ function downloadPDF() {
         body += h('Identification');
         body += row('Customer', s.customer) + row('Application', s.appName) + row('Engineer', s.engineer) + row('Review Date', s.reviewDate) + row('Call Date/Time', s.callDateTime);
         body += h('Section 1 — Sales & SOW');
-        body += row('SOW Reviewed', s.sowReviewed) + row('Sold Tier', s.soldTier) + row('Sold Container Count', s.soldContCount) + row('SOW Scope Status', s.sowScopeStatus) + row('Sales Scope Summary', s.salesSummary) + row('Assumptions/Exclusions', s.sowAssumptions) + row('Scope Delta', s.scopeDelta);
+        body += row('SOW Reviewed', s.sowReviewed) + row('Sold Tier', s.soldTier) + row('Sold Container Count', s.soldContCount) + row('SOW Scope Status', s.sowScopeStatus) + row('Sales Scope Summary', s.salesSummary) + row('Assumptions/Exclusions', s.sowAssumptions) + row('Scope Delta', s.scopeDelta) + row('SOW Reference', s.sowRef);
         body += h('Section 2 — Customer & Application');
-        body += row('Customer Tech Lead', s.custTechLead) + row('App/Product Owner', s.custAppOwner) + row('Security POC', s.secAuthPOC) + row('2F Mission Success POC', s.sf2FPOC) + row('2F Sales POC', s.sfSalesPOC) + row('Infra POC', s.custInfraPOC) + row('Target Environment', s.targetEnv) + row('Repository', s.repoLocation) + row('App Changed?', s.appChanged) + row('Changes Identified', s.changesIdentified);
+        body += row('Customer Tech Lead', s.custTechLead) + row('App/Product Owner', s.custAppOwner) + row('Security POC', s.secAuthPOC) + row('2F Mission Success POC', s.sf2FPOC) + row('2F Sales POC', s.sfSalesPOC) + row('Infra POC', s.custInfraPOC) + row('Target Environment', s.targetEnv) + row('Repository', s.repoLocation) + row('App Changed?', s.appChanged) + row('Changes Identified', s.changesIdentified) + row('Expected Outcome', s.custOutcome);
         body += h('Section 3 — Engineering Complexity');
         body += row('Containers (Score)', cs !== null ? 'Score ' + cs : '—') + row('Container Evidence', s.evContainers);
         body += row('Multi-Environment', me) + row('Multi-Env Evidence', s.evMultienv);
