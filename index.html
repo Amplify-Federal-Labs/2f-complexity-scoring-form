@@ -351,8 +351,8 @@
     <!-- IO toolbar -->
     <div class="io-toolbar">
         <span class="io-label">Data</span>
-        <button class="btn-io" onclick="exportJSON()">↓ Export JSON</button>
-        <button class="btn-io" onclick="document.getElementById('importFileInput').click()">↑ Import JSON</button>
+        <button class="btn-io" onclick="exportJSON()">↓ Save Data</button>
+        <button class="btn-io" onclick="document.getElementById('importFileInput').click()">↑ Load Data</button>
         <input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)">
         <span class="io-label" style="margin-left:6px">Export</span>
         <button class="btn-io" onclick="downloadPDF()">↓ PDF</button>
@@ -602,7 +602,7 @@
                 <button class="btn btn-secondary" onclick="switchTab('adv','s5',advBtnAt(5))">← Back</button>
                 <button class="btn btn-primary" onclick="downloadPDF()">↓ Export PDF</button>
                 <button class="btn btn-primary" onclick="downloadCSV()">↓ Export CSV</button>
-                <button class="btn btn-primary" onclick="exportJSON()">↓ Export JSON</button>
+                <button class="btn btn-primary" onclick="exportJSON()">↓ Save Data</button>
             </div>
         </div>
     </div><!-- #advanced-view -->
@@ -748,7 +748,8 @@ function switchTab(mode, name, btn) {
     const prefix = mode === 'simple' ? 'simple' : 'adv';
     const nav = document.getElementById(prefix + '-tabs');
     nav.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('#' + prefix + '-view .tab-panel, #' + (mode === 'adv' ? 'advanced' : 'simple') + '-view .tab-panel').forEach(p => p.classList.remove('active'));
+    const viewId = mode === 'adv' ? 'advanced-view' : 'simple-view';
+    document.querySelectorAll('#' + viewId + ' .tab-panel').forEach(p => p.classList.remove('active'));
     // Find panel by id
     const panelId = mode === 'simple' ? 'simple-' + name : 'adv-' + name;
     const panel = document.getElementById(panelId);
@@ -985,9 +986,11 @@ function exportJSON() {
     const s = getFormState();
     const name = (s.projectName || s.appName || s.customer || 'form').replace(/\s+/g,'_');
     const blob = new Blob([JSON.stringify(s, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
     a.download = (currentMode === 'simple' ? 'Scoring_' : 'DayZero_') + name + '.json';
     a.click();
+    URL.revokeObjectURL(url);
 }
 
 function importJSON(e) {
@@ -1022,7 +1025,8 @@ function downloadPDF() {
         .bl{font-size:9px;color:#999;text-transform:uppercase;margin-bottom:2px}
         .bv{font-size:16px;font-weight:700;color:#2a5298}`;
 
-    const row = (l, v) => `<div class="row"><div class="lbl">${l}</div><div class="val">${v || '—'}</div></div>`;
+    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const row = (l, v) => `<div class="row"><div class="lbl">${esc(l)}</div><div class="val">${esc(v) || '—'}</div></div>`;
     const h = t => `<h2>${t}</h2>`;
 
     // Scores
@@ -1098,7 +1102,7 @@ function downloadPDF() {
         body += row('Disposition', s.d0Disposition) + row('Completed Date', s.d0CompletedDate) + row('Technical Blockers', s.techBlockers) + row('Customer Deps', s.custDeps) + row('2F Deps', s.sfDeps) + row('3rd Party Deps', s.thirdPartyDeps) + row('Open Actions', s.openActions) + row('Final Notes', s.finalNotes);
     }
 
-    win.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>${styles}</style></head><body>${body}</body></html>`);
+    win.document.write(`<!DOCTYPE html><html><head><title>${esc(title)}</title><style>${styles}</style></head><body>${body}</body></html>`);
     win.document.close();
     setTimeout(() => win.print(), 600);
 }
@@ -1173,9 +1177,11 @@ function downloadCSV() {
     const csv = rows.join('\n');
     const name = (s.projectName || s.appName || s.customer || 'export').replace(/\s+/g,'_');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
     a.download = (currentMode === 'simple' ? 'Scoring_' : 'DayZero_') + name + '.csv';
     a.click();
+    URL.revokeObjectURL(url);
 }
 
 // ── Reset ──────────────────────────────────────────────────────────────────────
